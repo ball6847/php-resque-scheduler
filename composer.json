@@ -13,6 +13,9 @@
 			"ResqueScheduler": "lib/"
 		}
 	},
+	"bin": [
+		"bin/resque-scheduler"
+	],
 	"require": {
 		"chrisboulton/php-resque": "dev-master"
 	}

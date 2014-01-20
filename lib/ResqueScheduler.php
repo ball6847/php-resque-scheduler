@@ -55,6 +55,39 @@ class ResqueScheduler
 	}
 
 	/**
+	 * Enqueue a recurring job for execution using a cron expression.
+	 *
+	 * Identical to Resque::enqueue, however the first argument is a string in
+	 * crontab format
+	 *
+	 * @param string $cron Crontab expression.
+	 * @param string $queue The name of the queue to place the job in.
+	 * @param string $class The name of the class that contains the code to execute the job.
+	 * @param array $args Any optional arguments that should be passed when the job is executed.
+	 */
+	public static function enqueueCron($cron, $queue, $class, $args = array())
+	{
+		$at = self::getRecurringNextRun($cron);
+		self::validateJob($class, $queue);
+
+		$job = self::jobToHash($queue, $class, $args);
+		$job += array('cron' => $cron);
+		self::delayedPush($at, $job);
+
+		Resque_Event::trigger('afterSchedule', array(
+			'at'    => $at,
+			'queue' => $queue,
+			'class' => $class,
+			'args'  => $args,
+		));
+	}
+
+	public static function getRecurringNextRun($cron)
+	{
+		return Cron\CronExpression::factory($cron)->getNextRunDate();
+	}
+
+	/**
 	 * Directly append an item to the delayed queue schedule.
 	 *
 	 * @param DateTime|int $timestamp Timestamp job is scheduled to be run at.
@@ -144,7 +177,32 @@ class ResqueScheduler
 
         return $count;
     }
-	
+
+	/**
+	 * Removed a delayed recurring job from the queue.
+	 *
+	 * note: you must specify exactly the same crontab expression,
+	 * queue, class and arguments that you used when you added
+	 * to the delayed queue
+	 *
+	 * @param $cron
+	 * @param $queue
+	 * @param $class
+	 * @param $args
+	 * @return mixed
+	 */
+	public static function removeRecurringJob($cron, $queue, $class, $args)
+	{
+		$at = self::getRecurringNextRun($cron);
+		$key = 'delayed:' . self::getTimestamp($at);
+		$item = json_encode(self::jobToHash($queue, $class, $args) + array('cron' => $cron));
+		$redis = Resque::redis();
+		$count = $redis->lrem($key, 0, $item);
+		self::cleanupTimestamp($key, $at);
+
+		return $count;
+	}
+
 	/**
 	 * Generate hash of all job properties to be saved in the scheduled queue.
 	 *
@@ -225,7 +283,7 @@ class ResqueScheduler
 			$at = self::getTimestamp($at);
 		}
 	
-		$items = Resque::redis()->zrangebyscore('delayed_queue_schedule', '-inf', $at, array('limit' => array(0, 1)));
+		$items = Resque::redis()->zrangebyscore('delayed_queue_schedule', '-inf', $at, 'LIMIT', 0, 1);
 		if (!empty($items)) {
 			return $items[0];
 		}
