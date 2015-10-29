@@ -24,6 +24,6 @@
         }
     ],
     "require": {
-        "nazo/php-resque": "nazo-master"
+        "nazo/php-resque": "dev-nazo-master"
     }
 }
