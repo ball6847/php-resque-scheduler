@@ -10,10 +10,10 @@
 class ResqueScheduler
 {
 	const VERSION = "0.1";
-    const DELAYED_PREFIX = 'delayed:';
-    const DELAYED_QUEUE_SCHEDULE = 'delayed_queue_schedule';
+	const DELAYED_PREFIX = 'delayed:';
+	const DELAYED_QUEUE_SCHEDULE = 'delayed_queue_schedule';
 
-    /**
+	/**
 	 * Enqueue a job in a given number of seconds from now.
 	 *
 	 * Identical to Resque::enqueue, however the first argument is the number
@@ -228,6 +228,7 @@ class ResqueScheduler
 		}
 	
 		$items = Resque::redis()->zrangebyscore(self::DELAYED_QUEUE_SCHEDULE, '-inf', $at, array('limit' => array(0, 1)));
+
 		if (!empty($items)) {
 			return $items[0];
 		}
