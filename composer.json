@@ -1,5 +1,5 @@
 {
-	"name": "elijahsummers/php-resque-scheduler",
+	"name": "chrisboulton/php-resque-scheduler",
 	"type": "library",
 	"description": "php-resque-scheduler is a PHP port of resque-scheduler, which adds support for scheduling items in the future to Resque.",
 	"license": "MIT",
@@ -9,9 +9,6 @@
 			"email": "chris@bgigcommerce.com"
 		}
 	],
-	"require": {
-		"chrisboulton/php-resque": "dev-master"
-	},
 	"bin": [
 		"bin/resque-scheduler"
 	],
