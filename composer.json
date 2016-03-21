@@ -8,10 +8,8 @@
 			"email": "chris@bgigcommerce.com"
 		}
 	],
-	"autoload": {
-		"psr-0": {
-			"ResqueScheduler": "lib/"
-		}
+	"require": {
+		"chrisboulton/php-resque": "dev-master"
 	},
 	"bin": [
 		"bin/resque-scheduler"
