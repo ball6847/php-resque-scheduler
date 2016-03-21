@@ -9,10 +9,15 @@
 */
 class ResqueScheduler
 {
+<<<<<<< HEAD
 	const VERSION = "0.1";
 	const DELAYED_PREFIX = 'delayed:';
 	const DELAYED_QUEUE_SCHEDULE = 'delayed_queue_schedule';
 
+=======
+	const VERSION = "1.2-dev";
+	
+>>>>>>> remotes/danhunsaker/master
 	/**
 	 * Enqueue a job in a given number of seconds from now.
 	 *
