@@ -83,6 +83,11 @@ class ResqueScheduler_Worker
 
 			$payload = array_merge(array($item['queue'], $item['class']), $item['args']);
 			call_user_func_array('Resque::enqueue', $payload);
+
+			if (!empty($item['cron'])) {
+				$this->log(print_r($item, true));
+				ResqueScheduler::enqueueCron($item['cron'], $item['queue'], $item['class'], $item['args'][0]);
+			}
 		}
 	}
 	
